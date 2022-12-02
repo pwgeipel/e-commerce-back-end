@@ -1,4 +1,5 @@
 const router = require('express').Router();
+// const { ConnectionError } = require('sequelize/types');
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // The `/api/products` endpoint
@@ -8,6 +9,7 @@ router.get('/', async (req, res) => {
   // find all products
   try {
     const allProducts = await Product.findAll({
+       // be sure to include its associated Category and Tag data
       include: [{
         model: Category,
       },
@@ -15,17 +17,37 @@ router.get('/', async (req, res) => {
       model: Tag,
     }]
     });
+    if(!allProducts) {
+      res.status(404).json({message: "Products not found"})
+    }
     res.status(200).json(allProducts)
   } catch (err) {
-    res.status(500).json.err
+    res.status(500).json(err)
   }
-  // be sure to include its associated Category and Tag data
+ 
 });
 
 // get one product
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+  try {
+    const allProducts = await Product.findByPk(req.body, {
+      // be sure to include its associated Category and Tag data
+      include: [{
+        model: Category,
+      },
+    {
+      model: Tag,
+    }]
+    });
+    if(!allProducts) {
+      res.status(404).json({message: "Product with this id not found"})
+    }
+    res.status(200).json(allProducts)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+  
 });
 
 // create new product
@@ -38,6 +60,7 @@ router.post('/', (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
+
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
@@ -102,8 +125,22 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
+  try {
+    const deletedProduct = await Product.destroy(req.body, {
+      where: {
+        id: req.params.id
+      }
+    })
+
+  if (!id) {
+    res.status(404).json({ error: "Valid ID required"})
+  } 
+  res.status(200).json(deletedProduct);
+} catch (err) {
+  res.status(500).json.apply(err);
+}
 });
 
 module.exports = router;
