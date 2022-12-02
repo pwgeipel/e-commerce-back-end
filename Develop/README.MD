@@ -21,7 +21,7 @@ To use the application, first install mysql2, sequelize, and express on your com
 
 From the Develop folder, you may initialize the app with the command: "node server.js"
 
-You can view the application in use with the [Screencastify video]
+You can view the application in use with the [Screencastify video](https://drive.google.com/file/d/197zKvdvAipd41gbOFHGPyeVvDE3K0aUA/view)
 
 ## License
 
